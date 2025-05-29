@@ -3,7 +3,9 @@ package sqlreplayer
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/luijianfie/sqlreplayer/model"
 	"github.com/luijianfie/sqlreplayer/utils"
@@ -26,6 +28,12 @@ func LanuchAnalyzeTask(jobSeq uint64, c *model.Config) (*SQLReplayer, error) {
 			sr.logger.Sugar().Warnf("no files match pattern: %s", pattern)
 			continue
 		}
+
+		sort.Slice(matches, func(i, j int) bool {
+			infoI, _ := os.Stat(matches[i])
+			infoJ, _ := os.Stat(matches[j])
+			return infoI.ModTime().Before(infoJ.ModTime())
+		})
 
 		for _, f := range matches {
 			if !utils.FileExists(f) {

@@ -256,7 +256,6 @@ func NewSQLReplayer(jobSeq uint64, c *model.Config) (*SQLReplayer, error) {
 			SqlID2Fingerprint:  make(map[string]*sqlStatus),
 			SaveRawSQLInReport: c.SaveRawSQLInReport,
 			GenerateReport:     c.GenerateReport,
-			ReplaySQLType:      QUERY,
 			ReplayFilter:       c.ReplayFilter,
 			DryRun:             c.DryRun,
 			QueryID2RelayStats: make(map[string][]*sqlStatus),
@@ -325,6 +324,11 @@ func NewSQLReplayer(jobSeq uint64, c *model.Config) (*SQLReplayer, error) {
 
 			//set replay sql mode
 			strs := strings.Split(c.ReplaySQLType, ",")
+
+			if len(strs) == 0 {
+				strs = append(strs, "QUERY")
+			}
+
 			for _, str := range strs {
 				switch strings.ToUpper(strings.TrimSpace(str)) {
 				case "QUERY":
